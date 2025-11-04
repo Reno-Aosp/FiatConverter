@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<body>
+  <h1>Currency Converter</h1>
+  <input id="amount" value="1">
+  <select id="from"></select>
+  <select id="to"></select>
+  <button id="go">Convert</button>
+  <div id="out"></div>
+
+<script>
+async function load() {
+  const res = await fetch('/api/currencies');
+  const data = await res.json();
+  const codes = Object.keys(data);
+  const fromSel = document.getElementById('from');
+  const toSel = document.getElementById('to');
+  codes.forEach(c => {
+    fromSel.innerHTML += `<option>${c}</option>`;
+    toSel.innerHTML += `<option>${c}</option>`;
+  });
+}
+document.getElementById('go').onclick = async () => {
+  const from = fromSel.value, to = toSel.value, amount = parseFloat(amount.value);
+  const res = await fetch('/api/convert', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({from,to,amount})
+  });
+  const j = await res.json();
+  document.getElementById('out').innerText = `${j.amount} ${j.from} = ${j.result.toFixed(2)} ${j.to}`;
+};
+load();
+</script>
+</body>
+</html>
