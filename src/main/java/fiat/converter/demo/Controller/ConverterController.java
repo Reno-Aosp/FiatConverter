@@ -13,6 +13,9 @@ import fiat.converter.demo.Service.ConverterService;
 @RestController
 @RequestMapping("/api")
 public class ConverterController {
+    // No inheritance or polymorphism here - this is a plain REST controller
+    // Uses dependency injection (DI) for ConverterService - composition pattern
+    // Record ConvertRequest is a simple data carrier (no inheritance)
      private final ConverterService service;
 
     public ConverterController(ConverterService service) { this.service = service; }

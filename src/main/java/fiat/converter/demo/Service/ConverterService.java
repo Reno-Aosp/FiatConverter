@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ConverterService {
+    // No inheritance or polymorphism here - this is a plain service class
+    // Uses composition with Map for currency rates storage
     private final Map<String, Double> rates = new ConcurrentHashMap<>();
 
     public ConverterService() {

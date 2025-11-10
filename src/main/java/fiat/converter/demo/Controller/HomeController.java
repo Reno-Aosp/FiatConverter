@@ -7,6 +7,8 @@ import java.util.Map;
 
 @RestController
 public class HomeController {
+    // No inheritance or polymorphism here - this is a plain REST controller
+    // Uses Spring's @RestController annotation for web endpoints
     
     @GetMapping("/")
     public Map<String, Object> home() {
