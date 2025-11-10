@@ -10,8 +10,8 @@ public class Rupiah extends Currency { // INHERITANCE: Rupiah IS-A Currency
 
     // METHOD OVERRIDING - replaces parent's format() method with custom implementation
     @Override // This annotation indicates we're overriding a parent method
-    public String format(double amount) {
-        return String.format("Rp %, .0f", amount).replace(",", ".");
+    public String format() {
+        return String.format("Rp %,.0f", amount).replace(",", ".");
     }
     // POLYMORPHISM: Rupiah can be treated as Currency, but uses its own format() method
 }

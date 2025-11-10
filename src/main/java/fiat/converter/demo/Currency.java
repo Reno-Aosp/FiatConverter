@@ -5,6 +5,7 @@ public abstract class Currency {
     protected final String name;
     protected final String symbol;
     protected final double rateToUSD; // how many of this currency per 1 USD
+    protected double amount;  // Changed to protected for subclass access
 
     // Constructor - called by child classes using super()
     protected Currency(String name, String symbol, double rateToUSD) {
@@ -25,6 +26,9 @@ public abstract class Currency {
     public String format(double amount) {
         return String.format("%s %.2f", symbol, amount);
     }
+
+    // Abstract method for subclasses to implement
+    public abstract String format();
 }
 
 
