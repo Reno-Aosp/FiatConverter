@@ -9,6 +9,7 @@ public abstract class Currency {
         this.name = name;
         this.symbol = symbol;
         this.rateToUSD = rateToUSD;
+        
     }
 
     public double toUSD(double amount) { return amount / rateToUSD; }

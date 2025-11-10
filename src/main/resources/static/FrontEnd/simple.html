@@ -9,19 +9,21 @@
   <div id="out"></div>
 
 <script>
+const fromSel = document.getElementById('from');
+const toSel = document.getElementById('to');
+const amountInput = document.getElementById('amount');
+
 async function load() {
   const res = await fetch('/api/currencies');
   const data = await res.json();
   const codes = Object.keys(data);
-  const fromSel = document.getElementById('from');
-  const toSel = document.getElementById('to');
   codes.forEach(c => {
     fromSel.innerHTML += `<option>${c}</option>`;
     toSel.innerHTML += `<option>${c}</option>`;
   });
 }
 document.getElementById('go').onclick = async () => {
-  const from = fromSel.value, to = toSel.value, amount = parseFloat(amount.value);
+  const from = fromSel.value, to = toSel.value, amount = parseFloat(amountInput.value);
   const res = await fetch('/api/convert', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify({from,to,amount})
