@@ -13,7 +13,7 @@ public class ConverterService {
 
     public ConverterService() {
         rates.put("USD", 1.0);
-        rates.put("IDR", 15500.0);
+        rates.put("IDR", 16500.0);
         rates.put("EUR", 0.92);
         rates.put("JPY", 156.3);
         rates.put("GBP", 0.81);
