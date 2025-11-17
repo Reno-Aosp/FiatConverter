@@ -1,35 +1,50 @@
 package fiat.converter.demo.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.stereotype.Service;
+import java.util.Map;
 
 @Service
 public class ConverterService {
     // No inheritance or polymorphism here - this is a plain service class
-    // Uses composition with Map for currency rates storage
-    private final Map<String, Double> rates = new ConcurrentHashMap<>();
+    // Uses composition with ExchangeRateService for live rates
+    private final ExchangeRateService exchangeRateService;
 
-    public ConverterService() {
-        rates.put("USD", 1.0);
-        rates.put("IDR", 16500.0);
-        rates.put("EUR", 0.92);
-        rates.put("JPY", 156.3);
-        rates.put("GBP", 0.81);
-        rates.put("AUD", 1.54);
+    public ConverterService(ExchangeRateService exchangeRateService) {
+        this.exchangeRateService = exchangeRateService;
     }
 
-    public Map<String, Double> getRates() { return rates; }
+    public Map<String, Double> getRates() {
+        Map<String, Double> rates = exchangeRateService.getRates();
+        System.out.println("DEBUG: ConverterService returning rates: " + rates);
+        return rates;
+    }
 
     public double convert(String from, String to, double amount) {
-        if (!rates.containsKey(from) || !rates.containsKey(to))
-            throw new IllegalArgumentException("Unknown currency code");
+        Map<String, Double> rates = exchangeRateService.getRates();
+        
+        System.out.println("DEBUG: Converting " + amount + " from " + from + " to " + to);
+        System.out.println("DEBUG: Available rates: " + rates.keySet());
+        
+        if (rates.isEmpty()) {
+            throw new IllegalStateException("Exchange rates not loaded yet. Please try again in a few seconds.");
+        }
+        
+        if (!rates.containsKey(from)) {
+            throw new IllegalArgumentException("Unknown currency code: " + from);
+        }
+        
+        if (!rates.containsKey(to)) {
+            throw new IllegalArgumentException("Unknown currency code: " + to);
+        }
 
         double rateFrom = rates.get(from);
         double rateTo = rates.get(to);
 
+        // Convert to USD first, then to target currency
         double usdAmount = amount / rateFrom;
-        return usdAmount * rateTo;
+        double result = usdAmount * rateTo;
+        
+        System.out.println("DEBUG: Result = " + result);
+        return result;
     }
 }

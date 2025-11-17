@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.ResponseEntity;
 
 import fiat.converter.demo.Service.ConverterService;
 
-@CrossOrigin(origins = "http://localhost:5173", methods = { RequestMethod.GET, RequestMethod.POST })
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*") // Allow frontend to call backend from any origin
 public class ConverterController {
     // No inheritance or polymorphism here - this is a plain REST controller
     // Uses dependency injection (DI) for ConverterService - composition pattern
@@ -32,18 +32,53 @@ public class ConverterController {
     }
 
     @GetMapping("/currencies")
-    public Map<String, Double> list() { return service.getRates(); }
+    public ResponseEntity<?> list() {
+        try {
+            Map<String, Double> rates = service.getRates();
+            if (rates.isEmpty()) {
+                return ResponseEntity.status(503).body(Map.of(
+                    "error", "Exchange rates not loaded yet",
+                    "message", "Please try again in a few seconds"
+                ));
+            }
+            return ResponseEntity.ok(rates);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Failed to fetch currencies",
+                "message", e.getMessage()
+            ));
+        }
+    }
 
     @PostMapping("/convert")
-    public Map<String, Object> convert(@RequestBody ConvertRequest req) {
-        double result = service.convert(req.from(), req.to(), req.amount());
-        return Map.of(
-            "from", req.from(),
-            "to", req.to(),
-            "amount", req.amount(),
-            "result", result,
-            "rate", service.getRates().get(req.to())
-        );
+    public ResponseEntity<?> convert(@RequestBody ConvertRequest req) {
+        try {
+            System.out.println("DEBUG: Received convert request: " + req);
+            double result = service.convert(req.from(), req.to(), req.amount());
+            return ResponseEntity.ok(Map.of(
+                "from", req.from(),
+                "to", req.to(),
+                "amount", req.amount(),
+                "result", result,
+                "rate", service.getRates().get(req.to())
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "Invalid request",
+                "message", e.getMessage()
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(503).body(Map.of(
+                "error", "Service unavailable",
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Conversion failed",
+                "message", e.getMessage()
+            ));
+        }
     }
 }
 
